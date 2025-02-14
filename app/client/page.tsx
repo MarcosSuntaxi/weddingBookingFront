@@ -205,14 +205,14 @@ export default function ClientBooking() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin" />
-        <span className="ml-2">Cargando servicios...</span>
+        <span className="ml-2">Loading services...</span>
       </div>
     )
   }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Servicios para tu Boda</h1>
+      <h1 className="text-3xl font-bold mb-8">Services for your Wedding</h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center">
@@ -223,11 +223,11 @@ export default function ClientBooking() {
 
       <form onSubmit={handleSubmit}>
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border">
-          <h2 className="text-xl font-medium mb-4">Información del Cliente</h2>
+          <h2 className="text-xl font-medium mb-4">Customer Information</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block mb-1">Nombre del Cliente</label>
+              <label className="block mb-1">Client Name</label>
               <input
                 type="text"
                 value={clientName}
@@ -238,7 +238,7 @@ export default function ClientBooking() {
             </div>
 
             <div>
-              <label className="block mb-1">Fecha del Evento</label>
+              <label className="block mb-1">Event Date</label>
               <input
                 type="date"
                 value={date}
@@ -250,7 +250,7 @@ export default function ClientBooking() {
             </div>
 
             <div>
-              <label className="block mb-1">Ubicación</label>
+              <label className="block mb-1">Location</label>
               <input
                 type="text"
                 value={location}
@@ -270,7 +270,7 @@ export default function ClientBooking() {
               onChange={(e) => setSelectedServices({ ...selectedServices, catering: e.target.value })}
               className="w-full p-2 border rounded-md"
             >
-              <option value="">Selecciona Catering</option>
+              <option value="">Select Catering</option>
               {catering.map((service) => (
                 <option key={service.id_catering} value={service.id_catering}>
                   {service.name} - ${service.price}
@@ -280,13 +280,13 @@ export default function ClientBooking() {
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <h2 className="text-xl font-medium mb-4">Música</h2>
+            <h2 className="text-xl font-medium mb-4">Music</h2>
             <select
               value={selectedServices.music || ""}
               onChange={(e) => setSelectedServices({ ...selectedServices, music: e.target.value })}
               className="w-full p-2 border rounded-md"
             >
-              <option value="">Selecciona Música</option>
+              <option value="">Select Music</option>
               {music.map((service) => (
                 <option key={service.id_music} value={service.id_music}>
                   {service.name} - ${service.price}
@@ -296,13 +296,13 @@ export default function ClientBooking() {
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <h2 className="text-xl font-medium mb-4">Decoración</h2>
+            <h2 className="text-xl font-medium mb-4">Decoration</h2>
             <select
               value={selectedServices.decoration || ""}
               onChange={(e) => setSelectedServices({ ...selectedServices, decoration: e.target.value })}
               className="w-full p-2 border rounded-md"
             >
-              <option value="">Selecciona Decoración</option>
+              <option value="">Select Decoration</option>
               {decoration.map((service) => (
                 <option key={service.id_decoration} value={service.id_decoration}>
                   {service.name} - ${service.price}
@@ -312,13 +312,13 @@ export default function ClientBooking() {
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <h2 className="text-xl font-medium mb-4">Fotografía</h2>
+            <h2 className="text-xl font-medium mb-4">Photography</h2>
             <select
               value={selectedServices.photography || ""}
               onChange={(e) => setSelectedServices({ ...selectedServices, photography: e.target.value })}
               className="w-full p-2 border rounded-md"
             >
-              <option value="">Selecciona Fotografía</option>
+              <option value="">Select Photography</option>
               {photography.map((service) => (
                 <option key={service.id_photograhy} value={service.id_photograhy}>
                   {service.name} - ${service.price}
@@ -332,7 +332,7 @@ export default function ClientBooking() {
           type="submit"
           className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition-colors"
         >
-          Guardar Reserva
+          Save Reservation
         </button>
       </form>
 
@@ -340,32 +340,32 @@ export default function ClientBooking() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold mb-4">
-              Orden #{Math.floor(Math.random() * 1000)} - {clientName}
+              Order #{Math.floor(Math.random() * 1000)} - {clientName}
             </h2>
 
             <div className="space-y-4 mb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-gray-600">Fecha del evento:</p>
+                  <p className="text-gray-600">Event date:</p>
                   <p className="font-semibold">{new Date(date).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Ubicación:</p>
+                  <p className="text-gray-600">Location:</p>
                   <p className="font-semibold">{location}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-gray-600">Estado:</p>
-                <p className="font-semibold text-green-600">Por confirmar</p>
+                <p className="text-gray-600">State:</p>
+                <p className="font-semibold text-green-600">To be confirmed</p>
               </div>
             </div>
 
             <table className="w-full mb-6">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-2">Servicio</th>
-                  <th className="text-right py-2">Precio</th>
+                  <th className="text-left py-2">Service</th>
+                  <th className="text-right py-2">Price</th>
                 </tr>
               </thead>
               <tbody>
@@ -395,7 +395,7 @@ export default function ClientBooking() {
                 onClick={handleConfirm}
                 className="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
               >
-                Confirmar Reserva
+                Confirm Reservation
               </button>
             </div>
           </div>
