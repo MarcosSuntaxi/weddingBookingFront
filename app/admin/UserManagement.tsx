@@ -5,17 +5,32 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, PlusCircle, Pencil, Trash2, X, ArrowLeft, LogOut, RefreshCcw } from "lucide-react"
 import type { User, EditableUserData } from "./types"
-import { fetchUsers, deleteUser, editUser } from "./actions"
+import { fetchUsers, deleteUser, editUser, createUser } from "./actions"
 
 const mockUsers: User[] = [
-  { id: 1, username: "johndoe", email: "john@example.com", password: "hashedpassword1", created_at: "2023-01-01" },
-  { id: 2, username: "janesmith", email: "jane@example.com", password: "hashedpassword2", created_at: "2023-01-02" },
+  {
+    id: 1,
+    username: "johndoe",
+    email: "john@example.com",
+    password: "hashedpassword1",
+    created_at: "2023-01-01",
+    role: "user",
+  },
+  {
+    id: 2,
+    username: "janesmith",
+    email: "jane@example.com",
+    password: "hashedpassword2",
+    created_at: "2023-01-02",
+    role: "admin",
+  },
   {
     id: 3,
     username: "alicejohnson",
     email: "alice@example.com",
     password: "hashedpassword3",
     created_at: "2023-01-03",
+    role: "user",
   },
 ]
 
@@ -25,7 +40,7 @@ export default function UserManagement() {
   const [error, setError] = useState<string | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [formData, setFormData] = useState<EditableUserData>({ username: "", email: "", password: "" })
+  const [formData, setFormData] = useState<EditableUserData>({ username: "", email: "", password: "", role: "user" })
   const router = useRouter()
 
   const fetchUsersData = useCallback(async (retryCount = 0) => {
@@ -56,12 +71,10 @@ export default function UserManagement() {
     setLoading(true)
     setError(null)
     try {
-      // Note: The provided actions don't include a create user function.
-      // You may need to implement this on the server side.
-      // For now, we'll just refresh the user list
+      await createUser(formData)
       await fetchUsersData()
       setIsFormOpen(false)
-      setFormData({ username: "", email: "", password: "" })
+      setFormData({ username: "", email: "", password: "", role: "user" })
     } catch (err) {
       setError("Error al crear usuario. Por favor, intente más tarde.")
       console.error("Error creating user:", err)
@@ -80,7 +93,7 @@ export default function UserManagement() {
       await fetchUsersData()
       setIsFormOpen(false)
       setEditingUser(null)
-      setFormData({ username: "", email: "", password: "" })
+      setFormData({ username: "", email: "", password: "", role: "user" })
     } catch (err) {
       setError("Error al actualizar usuario. Por favor, intente más tarde.")
       console.error("Error updating user:", err)
@@ -107,10 +120,10 @@ export default function UserManagement() {
   const openForm = (user: User | null = null) => {
     if (user) {
       setEditingUser(user)
-      setFormData({ username: user.username, email: user.email, password: "" })
+      setFormData({ username: user.username, email: user.email, password: "", role: user.role })
     } else {
       setEditingUser(null)
-      setFormData({ username: "", email: "", password: "" })
+      setFormData({ username: "", email: "", password: "", role: "user" })
     }
     setIsFormOpen(true)
   }
@@ -118,7 +131,7 @@ export default function UserManagement() {
   const closeForm = () => {
     setIsFormOpen(false)
     setEditingUser(null)
-    setFormData({ username: "", email: "", password: "" })
+    setFormData({ username: "", email: "", password: "", role: "user" })
   }
 
   const handleGoBack = () => {
@@ -134,7 +147,7 @@ export default function UserManagement() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
-        <span className="ml-2 text-black">Loading users...</span>
+        <span className="ml-2 text-black">Cargando usuarios...</span>
       </div>
     )
   }
@@ -152,14 +165,14 @@ export default function UserManagement() {
         </button>
       </div>
 
-      <h2 className="text-3xl font-bold mb-6 text-black">User Management</h2>
+      <h2 className="text-3xl font-bold mb-6 text-black">Gestión de Usuarios</h2>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center justify-between">
           <span>{error}</span>
           <button onClick={() => fetchUsersData()} className="flex items-center text-red-600 hover:text-red-800">
             <RefreshCcw className="w-4 h-4 mr-2" />
-            Retry
+            Reintentar
           </button>
         </div>
       )}
@@ -169,7 +182,7 @@ export default function UserManagement() {
         className="mb-6 bg-pink-500 text-white py-2 px-4 rounded-md hover:bg-pink-600 transition-colors flex items-center"
       >
         <PlusCircle className="w-5 h-5 mr-2" />
-        Add User
+        Añadir Usuario
       </button>
 
       {isFormOpen && (
@@ -184,7 +197,7 @@ export default function UserManagement() {
             <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
               <div className="mb-4">
                 <label htmlFor="username" className="block mb-1 text-black">
-                  User name
+                  Nombre de Usuario
                 </label>
                 <input
                   type="text"
@@ -209,8 +222,23 @@ export default function UserManagement() {
                 />
               </div>
               <div className="mb-4">
+                <label htmlFor="role" className="block mb-1 text-gray-700">
+                  Rol
+                </label>
+                <select
+                  id="role"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full p-2 border rounded-md text-gray-700"
+                  required
+                >
+                  <option value="user">Usuario</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+              <div className="mb-4">
                 <label htmlFor="password" className="block mb-1 text-black">
-                  Password
+                  Contraseña
                 </label>
                 <input
                   type="password"
@@ -236,10 +264,11 @@ export default function UserManagement() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-pink-100">
-              <th className="p-3 text-left text-black">User name</th>
+              <th className="p-3 text-left text-black">Nombre de Usuario</th>
               <th className="p-3 text-left text-black">Email</th>
-              <th className="p-3 text-left text-black">Creation Date</th>
-              <th className="p-3 text-left text-black">Actions</th>
+              <th className="p-3 text-left text-black">Rol</th>
+              <th className="p-3 text-left text-black">Fecha de Creación</th>
+              <th className="p-3 text-left text-black">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -247,6 +276,7 @@ export default function UserManagement() {
               <tr key={user.id} className="border-b border-pink-100">
                 <td className="p-3 text-black">{user.username}</td>
                 <td className="p-3 text-black">{user.email}</td>
+                <td className="p-3 text-black">{user.role}</td>
                 <td className="p-3 text-black">{new Date(user.created_at).toLocaleDateString()}</td>
                 <td className="p-3">
                   <button onClick={() => openForm(user)} className="mr-2 text-blue-500 hover:text-blue-700">

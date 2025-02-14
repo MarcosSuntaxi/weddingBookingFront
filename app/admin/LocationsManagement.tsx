@@ -99,14 +99,14 @@ export default function LocationsManagement() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2 text-gray-700">Loading locations...</span>
+        <span className="ml-2 text-gray-700">Cargando ubicaciones...</span>
       </div>
     )
   }
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Location Management</h2>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Ubicaciones</h2>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">{error}</div>}
 
@@ -127,7 +127,7 @@ export default function LocationsManagement() {
             <form onSubmit={handleCreateLocation}>
               <div className="mb-4">
                 <label htmlFor="location_name" className="block mb-1 text-gray-700">
-                Location Name
+                  Nombre de la Ubicación
                 </label>
                 <input
                   type="text"
@@ -140,7 +140,7 @@ export default function LocationsManagement() {
               </div>
               <div className="mb-4">
                 <label htmlFor="province_id" className="block mb-1 text-gray-700">
-                Province ID
+                  ID de la Provincia
                 </label>
                 <input
                   type="number"
@@ -152,7 +152,7 @@ export default function LocationsManagement() {
                 />
               </div>
               <button type="submit" className="w-full btn-primary">
-                Create
+                Crear
               </button>
             </form>
           </div>
@@ -164,8 +164,8 @@ export default function LocationsManagement() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Province ID</th>
+              <th>Nombre</th>
+              <th>ID de Provincia</th>
             </tr>
           </thead>
           <tbody>
@@ -180,7 +180,7 @@ export default function LocationsManagement() {
             ) : (
               <tr>
                 <td colSpan={3} className="text-center py-4">
-                No locations available
+                  No hay ubicaciones disponibles
                 </td>
               </tr>
             )}
