@@ -149,7 +149,7 @@ export default function ServiceManagement() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Gestión de Servicios</h2>
+      <h2 className="text-2xl font-bold mb-4">Service Management</h2>
 
       {/* Crear servicio */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
