@@ -24,11 +24,11 @@ export default function Confirmation() {
         </div>
         <h1 className="text-3xl font-bold mb-4 text-gray-800">¡Reserva Confirmada!</h1>
         <p className="text-gray-600 mb-8">
-          Gracias por confiar en nosotros para tu día especial. Te hemos enviado un correo electrónico con los detalles
-          de tu reserva.
+        Thank you for trusting us for your special day. We have sent you an email with the details
+        of your reservation.
         </p>
         <button onClick={() => router.push("/")} className="btn-primary w-full">
-          Volver al Inicio
+        Back to Home
         </button>
         <p className="text-sm text-gray-500 mt-4">Serás redirigido automáticamente en 5 segundos...</p>
       </div>
