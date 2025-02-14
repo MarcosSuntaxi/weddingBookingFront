@@ -52,14 +52,14 @@ export default function LocationsManagement() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           query: `
-            mutation($input: CreateLocationInput!) {
-              createLocation(input: $input) {
-                location_id
-                location_name
-                province_id
-              }
+          mutation createLocation($input: LocationInput!) {
+            createLocation(input: $input) {
+              location_id
+              location_name
+              province_id
             }
-          `,
+          }
+        `,
           variables: {
             input: {
               location_name: formData.location_name,
@@ -68,7 +68,13 @@ export default function LocationsManagement() {
           },
         }),
       })
-      if (!response.ok) throw new Error("Failed to create location")
+
+      const result = await response.json()
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message)
+      }
+
       await fetchLocations()
       setIsFormOpen(false)
       setFormData({ location_name: "", province_id: "" })
@@ -163,13 +169,21 @@ export default function LocationsManagement() {
             </tr>
           </thead>
           <tbody>
-            {locations.map((location) => (
-              <tr key={location.location_id}>
-                <td>{location.location_id}</td>
-                <td>{location.location_name}</td>
-                <td>{location.province_id}</td>
+            {locations && locations.length > 0 ? (
+              locations.map((location) => (
+                <tr key={location.location_id}>
+                  <td>{location.location_id}</td>
+                  <td>{location.location_name}</td>
+                  <td>{location.province_id}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="text-center py-4">
+                  No hay ubicaciones disponibles
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
