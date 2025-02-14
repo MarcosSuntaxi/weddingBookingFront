@@ -134,7 +134,7 @@ export default function UserManagement() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
-        <span className="ml-2 text-black">Cargando usuarios...</span>
+        <span className="ml-2 text-black">Loading users...</span>
       </div>
     )
   }
@@ -152,14 +152,14 @@ export default function UserManagement() {
         </button>
       </div>
 
-      <h2 className="text-3xl font-bold mb-6 text-black">Gestión de Usuarios</h2>
+      <h2 className="text-3xl font-bold mb-6 text-black">User Management</h2>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center justify-between">
           <span>{error}</span>
           <button onClick={() => fetchUsersData()} className="flex items-center text-red-600 hover:text-red-800">
             <RefreshCcw className="w-4 h-4 mr-2" />
-            Reintentar
+            Retry
           </button>
         </div>
       )}
@@ -169,7 +169,7 @@ export default function UserManagement() {
         className="mb-6 bg-pink-500 text-white py-2 px-4 rounded-md hover:bg-pink-600 transition-colors flex items-center"
       >
         <PlusCircle className="w-5 h-5 mr-2" />
-        Añadir Usuario
+        Add User
       </button>
 
       {isFormOpen && (
@@ -184,7 +184,7 @@ export default function UserManagement() {
             <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
               <div className="mb-4">
                 <label htmlFor="username" className="block mb-1 text-black">
-                  Nombre de Usuario
+                  User name
                 </label>
                 <input
                   type="text"
@@ -210,7 +210,7 @@ export default function UserManagement() {
               </div>
               <div className="mb-4">
                 <label htmlFor="password" className="block mb-1 text-black">
-                  Contraseña
+                  Password
                 </label>
                 <input
                   type="password"
@@ -236,10 +236,10 @@ export default function UserManagement() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-pink-100">
-              <th className="p-3 text-left text-black">Nombre de Usuario</th>
+              <th className="p-3 text-left text-black">User name</th>
               <th className="p-3 text-left text-black">Email</th>
-              <th className="p-3 text-left text-black">Fecha de Creación</th>
-              <th className="p-3 text-left text-black">Acciones</th>
+              <th className="p-3 text-left text-black">Creation Date</th>
+              <th className="p-3 text-left text-black">Actions</th>
             </tr>
           </thead>
           <tbody>
