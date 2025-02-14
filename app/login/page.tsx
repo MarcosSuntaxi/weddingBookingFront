@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { UserCircle2, Lock } from "lucide-react"
 
-// Datos de usuarios para autenticación
+// User authentication data
 const users = [
   { email: "masuntaxic@uce.edu.ec", password: "admin123", role: "administrator" },
   { email: "pjcatota@uce.edu.ec", password: "admin123", role: "user" },
@@ -38,7 +38,7 @@ export default function Login() {
         router.push("/client")
       }
     } else {
-      setError("Credenciales inválidas. Por favor, intente nuevamente.")
+      setError("Invalid credentials. Please try again.")
     }
   }
 
@@ -46,8 +46,8 @@ export default function Login() {
     <div className="min-h-screen elegant-bg flex items-center justify-center p-4">
       <div className="bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-xl w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Bienvenido</h1>
-          <p className="text-gray-600">Ingrese sus credenciales para continuar</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome</h1>
+          <p className="text-gray-600">Enter your credentials to continue</p>
         </div>
 
         {error && <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">{error}</div>}
@@ -61,7 +61,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ejemplo@uce.edu.ec"
+                placeholder="example@uce.edu.ec"
                 className="pl-10 w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                 required
               />
@@ -69,14 +69,14 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Ingrese su contraseña"
+                placeholder="Enter your password"
                 className="pl-10 w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                 required
               />
@@ -87,17 +87,13 @@ export default function Login() {
             type="submit"
             className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
           >
-            Ingresar
+            Sign In
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Credenciales de prueba:</p>
-          <p>Email: masuntaxic@uce.edu.ec</p>
-          <p>Contraseña: admin123</p>
         </div>
       </div>
     </div>
   )
 }
-
