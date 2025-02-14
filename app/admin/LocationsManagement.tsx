@@ -9,6 +9,7 @@ interface Location {
   province_id: number
 }
 
+
 export default function LocationsManagement() {
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading] = useState(true)

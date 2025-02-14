@@ -28,12 +28,22 @@ jobs:
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > /tmp/key.pem
           chmod 400 /tmp/key.pem
+          
           ssh -o StrictHostKeyChecking=no -i /tmp/key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+            set -e
+            
+            # Actualizar el contenedor con la última imagen
             docker pull marcossuntaxi/frontend:latest
 
-            docker-compose pull
+            # Ir al directorio del proyecto (ajusta según sea necesario)
+            cd /home/${{ secrets.AWS_USER }}/app
 
-            docker-compose up -d
+            # Actualizar y reiniciar los servicios
+            docker-compose down
+            docker-compose up -d --remove-orphans
 
             exit
           EOF
+
+      - name: Clean up
+        run: rm -f /tmp/key.pem
