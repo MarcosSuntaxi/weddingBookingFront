@@ -158,7 +158,7 @@ export default function ServiceManagement() {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Crear Nuevo Servicio</DialogTitle>
+            <DialogTitle>Create New Service</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
 
@@ -175,13 +175,13 @@ export default function ServiceManagement() {
                   🍽️ Catering
                 </SelectItem>
                 <SelectItem value="music" className="hover:bg-green-100 hover:text-green-700 font-semibold">
-                  🎵 Música
+                  🎵 Music
                 </SelectItem>
                 <SelectItem value="decoration" className="hover:bg-yellow-100 hover:text-yellow-700 font-semibold">
-                  🎨 Decoración
+                  🎨 Decoration
                 </SelectItem>
                 <SelectItem value="photography" className="hover:bg-purple-100 hover:text-purple-700 font-semibold">
-                  📷 Fotografía
+                  📷 Photography
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -206,7 +206,7 @@ export default function ServiceManagement() {
               onClick={handleCreateService}
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-md"
             >
-              Crear
+              Create
             </Button>
 
           </div>
@@ -232,7 +232,7 @@ export default function ServiceManagement() {
               value={editingService?.price || ""}
               onChange={(e) => setEditingService({ ...editingService!, price: Number(e.target.value) })}
             />
-            <Button onClick={handleUpdateService}>Actualizar</Button>
+            <Button onClick={handleUpdateService}>Update</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -244,9 +244,9 @@ export default function ServiceManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Precio</TableHead>
-                <TableHead>Acciones</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -255,8 +255,8 @@ export default function ServiceManagement() {
                   <TableCell>{service.name}</TableCell>
                   <TableCell>${service.price}</TableCell>
                   <TableCell>
-                    <Button variant="outline" onClick={() => { setEditingService(service); setIsEditDialogOpen(true) }}>Actualizar</Button>
-                    <Button variant="destructive" onClick={() => handleDeleteService(service)}>Eliminar</Button>
+                    <Button variant="outline" onClick={() => { setEditingService(service); setIsEditDialogOpen(true) }}>Update</Button>
+                    <Button variant="destructive" onClick={() => handleDeleteService(service)}>Delete</Button>
                   </TableCell>
                 </TableRow>
               ))}
