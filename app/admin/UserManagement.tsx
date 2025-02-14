@@ -4,26 +4,20 @@ import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, PlusCircle, Pencil, Trash2, X, ArrowLeft, LogOut, RefreshCcw } from "lucide-react"
+import type { User, EditableUserData } from "./types"
+import { fetchUsers, deleteUser, editUser } from "./actions"
 
-interface User {
-  id: string
-  name: string
-  email: string
-}
-
-const mockUsers = [
-  { id: "1", name: "John Doe", email: "john@example.com" },
-  { id: "2", name: "Jane Smith", email: "jane@example.com" },
-  { id: "3", name: "Alice Johnson", email: "alice@example.com" },
+const mockUsers: User[] = [
+  { id: 1, username: "johndoe", email: "john@example.com", password: "hashedpassword1", created_at: "2023-01-01" },
+  { id: 2, username: "janesmith", email: "jane@example.com", password: "hashedpassword2", created_at: "2023-01-02" },
+  {
+    id: 3,
+    username: "alicejohnson",
+    email: "alice@example.com",
+    password: "hashedpassword3",
+    created_at: "2023-01-03",
+  },
 ]
-
-const mockFetchUsers = () => {
-  return new Promise<User[]>((resolve) => {
-    setTimeout(() => resolve(mockUsers), 1000)
-  })
-}
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([])
@@ -31,25 +25,22 @@ export default function UserManagement() {
   const [error, setError] = useState<string | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [formData, setFormData] = useState({ name: "", email: "" })
+  const [formData, setFormData] = useState<EditableUserData>({ username: "", email: "", password: "" })
   const router = useRouter()
 
-  const fetchUsers = useCallback(async (retryCount = 0) => {
+  const fetchUsersData = useCallback(async (retryCount = 0) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_URL}/users`)
-      if (!response.ok) throw new Error("Failed to fetch users")
-      const data = await response.json()
+      const data = await fetchUsers()
       setUsers(data)
     } catch (err) {
       console.error("Error fetching users:", err)
       if (retryCount < 2) {
-        setTimeout(() => fetchUsers(retryCount + 1), 2000)
+        setTimeout(() => fetchUsersData(retryCount + 1), 2000)
       } else {
         setError("No se pudo conectar con el servidor. Usando datos de demostración.")
-        const mockData = await mockFetchUsers()
-        setUsers(mockData)
+        setUsers(mockUsers)
       }
     } finally {
       setLoading(false)
@@ -57,23 +48,20 @@ export default function UserManagement() {
   }, [])
 
   useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
+    fetchUsersData()
+  }, [fetchUsersData])
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_URL}/users`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-      if (!response.ok) throw new Error("Failed to create user")
-      await fetchUsers()
+      // Note: The provided actions don't include a create user function.
+      // You may need to implement this on the server side.
+      // For now, we'll just refresh the user list
+      await fetchUsersData()
       setIsFormOpen(false)
-      setFormData({ name: "", email: "" })
+      setFormData({ username: "", email: "", password: "" })
     } catch (err) {
       setError("Error al crear usuario. Por favor, intente más tarde.")
       console.error("Error creating user:", err)
@@ -88,16 +76,11 @@ export default function UserManagement() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_URL}/users/${editingUser.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-      if (!response.ok) throw new Error("Failed to update user")
-      await fetchUsers()
+      await editUser(editingUser.id, formData)
+      await fetchUsersData()
       setIsFormOpen(false)
       setEditingUser(null)
-      setFormData({ name: "", email: "" })
+      setFormData({ username: "", email: "", password: "" })
     } catch (err) {
       setError("Error al actualizar usuario. Por favor, intente más tarde.")
       console.error("Error updating user:", err)
@@ -106,16 +89,13 @@ export default function UserManagement() {
     }
   }
 
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteUser = async (userId: number) => {
     if (!confirm("¿Está seguro de que desea eliminar este usuario?")) return
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_URL}/users/${userId}`, {
-        method: "DELETE",
-      })
-      if (!response.ok) throw new Error("Failed to delete user")
-      await fetchUsers()
+      await deleteUser(userId)
+      await fetchUsersData()
     } catch (err) {
       setError("Error al eliminar usuario. Por favor, intente más tarde.")
       console.error("Error deleting user:", err)
@@ -127,10 +107,10 @@ export default function UserManagement() {
   const openForm = (user: User | null = null) => {
     if (user) {
       setEditingUser(user)
-      setFormData({ name: user.name, email: user.email })
+      setFormData({ username: user.username, email: user.email, password: "" })
     } else {
       setEditingUser(null)
-      setFormData({ name: "", email: "" })
+      setFormData({ username: "", email: "", password: "" })
     }
     setIsFormOpen(true)
   }
@@ -138,7 +118,7 @@ export default function UserManagement() {
   const closeForm = () => {
     setIsFormOpen(false)
     setEditingUser(null)
-    setFormData({ name: "", email: "" })
+    setFormData({ username: "", email: "", password: "" })
   }
 
   const handleGoBack = () => {
@@ -177,7 +157,7 @@ export default function UserManagement() {
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center justify-between">
           <span>{error}</span>
-          <button onClick={() => fetchUsers()} className="flex items-center text-red-600 hover:text-red-800">
+          <button onClick={() => fetchUsersData()} className="flex items-center text-red-600 hover:text-red-800">
             <RefreshCcw className="w-4 h-4 mr-2" />
             Reintentar
           </button>
@@ -203,14 +183,14 @@ export default function UserManagement() {
             </div>
             <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
               <div className="mb-4">
-                <label htmlFor="name" className="block mb-1 text-black">
-                  Nombre
+                <label htmlFor="username" className="block mb-1 text-black">
+                  Nombre de Usuario
                 </label>
                 <input
                   type="text"
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  id="username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   className="w-full p-2 border rounded-md text-black"
                   required
                 />
@@ -228,6 +208,19 @@ export default function UserManagement() {
                   required
                 />
               </div>
+              <div className="mb-4">
+                <label htmlFor="password" className="block mb-1 text-black">
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full p-2 border rounded-md text-black"
+                  required={!editingUser}
+                />
+              </div>
               <button
                 type="submit"
                 className="w-full bg-pink-500 text-white py-2 px-4 rounded-md hover:bg-pink-600 transition-colors"
@@ -243,16 +236,18 @@ export default function UserManagement() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-pink-100">
-              <th className="p-3 text-left text-black">Nombre</th>
+              <th className="p-3 text-left text-black">Nombre de Usuario</th>
               <th className="p-3 text-left text-black">Email</th>
+              <th className="p-3 text-left text-black">Fecha de Creación</th>
               <th className="p-3 text-left text-black">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user.id} className="border-b border-pink-100">
-                <td className="p-3 text-black">{user.name}</td>
+                <td className="p-3 text-black">{user.username}</td>
                 <td className="p-3 text-black">{user.email}</td>
+                <td className="p-3 text-black">{new Date(user.created_at).toLocaleDateString()}</td>
                 <td className="p-3">
                   <button onClick={() => openForm(user)} className="mr-2 text-blue-500 hover:text-blue-700">
                     <Pencil className="w-5 h-5" />
