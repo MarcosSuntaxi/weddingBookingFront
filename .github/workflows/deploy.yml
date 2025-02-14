@@ -28,17 +28,41 @@ jobs:
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > /tmp/key.pem
           chmod 400 /tmp/key.pem
-          
+
           ssh -o StrictHostKeyChecking=no -i /tmp/key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             set -e
             
-            # Actualizar el contenedor con la última imagen
+            # Install Docker if not installed
+            if ! command -v docker &> /dev/null; then
+              echo "🚀 Installing Docker..."
+              sudo yum update -y
+              sudo yum install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ec2-user
+            else
+              echo "✅ Docker is already installed."
+            fi
+
+            # Install Docker Compose if not installed
+            if ! command -v docker-compose &> /dev/null; then
+              echo "🚀 Installing Docker Compose..."
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            else
+              echo "✅ Docker Compose is already installed."
+            fi
+
+            # Ensure user permissions are updated
+            sudo chmod 666 /var/run/docker.sock
+
+            # Pull the latest frontend image
             docker pull marcossuntaxi/frontend:latest
 
-            # Ir al directorio del proyecto (ajusta según sea necesario)
+            # Navigate to project directory (change if needed)
             cd /home/${{ secrets.AWS_USER }}/app
 
-            # Actualizar y reiniciar los servicios
+            # Restart services with the latest image
             docker-compose down
             docker-compose up -d --remove-orphans
 

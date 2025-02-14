@@ -11,6 +11,7 @@ export async function fetchUsers(): Promise<User[]> {
 }
 
 
+
 export async function createUser(userData: EditableUserData): Promise<User> {
   const response = await fetch("http://13.216.230.146:3006/api/users", {
     method: "POST",
