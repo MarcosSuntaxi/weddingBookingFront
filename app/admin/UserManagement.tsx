@@ -157,15 +157,15 @@ export default function UserManagement() {
       <div className="flex justify-between items-center mb-6">
         <button onClick={handleGoBack} className="text-black hover:text-pink-700 transition-colors flex items-center">
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Regresar
+          Go back
         </button>
         <button onClick={handleLogout} className="text-black hover:text-pink-700 transition-colors flex items-center">
           <LogOut className="w-5 h-5 mr-2" />
-          Cerrar Sesión
+          Log out
         </button>
       </div>
 
-      <h2 className="text-3xl font-bold mb-6 text-black">Gestión de Usuarios</h2>
+      <h2 className="text-3xl font-bold mb-6 text-black">User Management</h2>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center justify-between">
@@ -182,14 +182,14 @@ export default function UserManagement() {
         className="mb-6 bg-pink-500 text-white py-2 px-4 rounded-md hover:bg-pink-600 transition-colors flex items-center"
       >
         <PlusCircle className="w-5 h-5 mr-2" />
-        Añadir Usuario
+        Add User
       </button>
 
       {isFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-black">{editingUser ? "Editar Usuario" : "Añadir Usuario"}</h3>
+              <h3 className="text-xl font-bold text-black">{editingUser ? "Editar User" : "Add User"}</h3>
               <button onClick={closeForm} className="text-gray-500 hover:text-gray-700">
                 <X className="w-6 h-6" />
               </button>
@@ -197,7 +197,7 @@ export default function UserManagement() {
             <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
               <div className="mb-4">
                 <label htmlFor="username" className="block mb-1 text-black">
-                  Nombre de Usuario
+                  User name
                 </label>
                 <input
                   type="text"
@@ -223,7 +223,7 @@ export default function UserManagement() {
               </div>
               <div className="mb-4">
                 <label htmlFor="role" className="block mb-1 text-gray-700">
-                  Rol
+                  Role
                 </label>
                 <select
                   id="role"
@@ -232,8 +232,8 @@ export default function UserManagement() {
                   className="w-full p-2 border rounded-md text-gray-700"
                   required
                 >
-                  <option value="user">Usuario</option>
-                  <option value="admin">Administrador</option>
+                  <option value="user">User</option>
+                  <option value="admin">Administrator</option>
                 </select>
               </div>
               <div className="mb-4">
@@ -264,11 +264,11 @@ export default function UserManagement() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-pink-100">
-              <th className="p-3 text-left text-black">Nombre de Usuario</th>
+              <th className="p-3 text-left text-black">User name</th>
               <th className="p-3 text-left text-black">Email</th>
-              <th className="p-3 text-left text-black">Rol</th>
-              <th className="p-3 text-left text-black">Fecha de Creación</th>
-              <th className="p-3 text-left text-black">Acciones</th>
+              <th className="p-3 text-left text-black">Role</th>
+              <th className="p-3 text-left text-black">Creation Date</th>
+              <th className="p-3 text-left text-black">Actions</th>
             </tr>
           </thead>
           <tbody>
