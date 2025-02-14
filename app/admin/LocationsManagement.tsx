@@ -99,27 +99,27 @@ export default function LocationsManagement() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2 text-gray-700">Cargando ubicaciones...</span>
+        <span className="ml-2 text-gray-700">Loading locations...</span>
       </div>
     )
   }
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Ubicaciones</h2>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800">Location Management</h2>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">{error}</div>}
 
       <button onClick={openForm} className="mb-6 btn-primary flex items-center">
         <PlusCircle className="w-5 h-5 mr-2" />
-        Añadir Ubicación
+        Add Location
       </button>
 
       {isFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-800">Añadir Ubicación</h3>
+              <h3 className="text-xl font-bold text-gray-800">Add Location</h3>
               <button onClick={closeForm} className="text-gray-500 hover:text-gray-700">
                 <X className="w-6 h-6" />
               </button>
@@ -127,7 +127,7 @@ export default function LocationsManagement() {
             <form onSubmit={handleCreateLocation}>
               <div className="mb-4">
                 <label htmlFor="location_name" className="block mb-1 text-gray-700">
-                  Nombre de la Ubicación
+                Location Name
                 </label>
                 <input
                   type="text"
@@ -140,7 +140,7 @@ export default function LocationsManagement() {
               </div>
               <div className="mb-4">
                 <label htmlFor="province_id" className="block mb-1 text-gray-700">
-                  ID de la Provincia
+                Province ID
                 </label>
                 <input
                   type="number"
@@ -152,7 +152,7 @@ export default function LocationsManagement() {
                 />
               </div>
               <button type="submit" className="w-full btn-primary">
-                Crear
+                Create
               </button>
             </form>
           </div>
@@ -164,8 +164,8 @@ export default function LocationsManagement() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Nombre</th>
-              <th>ID de Provincia</th>
+              <th>Name</th>
+              <th>Province ID</th>
             </tr>
           </thead>
           <tbody>
@@ -180,7 +180,7 @@ export default function LocationsManagement() {
             ) : (
               <tr>
                 <td colSpan={3} className="text-center py-4">
-                  No hay ubicaciones disponibles
+                  No locations available
                 </td>
               </tr>
             )}
