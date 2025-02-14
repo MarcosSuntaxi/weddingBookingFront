@@ -1,11 +1,36 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from "@/components/ui/use-toast"
+import {
+  createCateringService,
+  createMusicService,
+  createDecorationService,
+  createPhotographyService,
+  fetchCateringServices,
+  fetchMusicServices,
+  fetchDecorationServices,
+  fetchPhotographyServices,
+  updateCateringService,
+  updateMusicService,
+  updateDecorationService,
+  updatePhotographyService,
+  deleteCateringService,
+  deleteMusicService,
+  deleteDecorationService,
+  deletePhotographyService,
+} from "@/app/services/api"
 
 interface Service {
   id: string
   name: string
   price: number
+  category: "catering" | "music" | "decoration" | "photography"
 }
 
 export default function ServiceManagement() {
@@ -16,6 +41,9 @@ export default function ServiceManagement() {
     photography: [],
   })
   const [newService, setNewService] = useState({ type: "", name: "", price: "" })
+  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchAllServices()
@@ -23,119 +51,97 @@ export default function ServiceManagement() {
 
   const fetchAllServices = async () => {
     try {
-      const cateringResponse = await fetch("http://44.208.178.247:8072/graphql", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: "{ getAllCatering { id_catering name price } }" }),
-      })
-      const cateringData = await cateringResponse.json()
-
-      const musicResponse = await fetch("http://54.173.57.181:8062/graphql", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: "{ getAllMusic { id_music name price } }" }),
-      })
-      const musicData = await musicResponse.json()
-
-      const decorationResponse = await fetch("http://44.212.202.69:8042/graphql", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: "{ getAllDecoration { id_decoration name price } }" }),
-      })
-      const decorationData = await decorationResponse.json()
-
-      const photographyResponse = await fetch("http://3.229.141.153:8052/graphql", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: "{ getAllPhotography { id_photograhy name price } }" }),
-      })
-      const photographyData = await photographyResponse.json()
+      const [catering, music, decoration, photography] = await Promise.all([
+        fetchCateringServices(),
+        fetchMusicServices(),
+        fetchDecorationServices(),
+        fetchPhotographyServices(),
+      ])
 
       setServices({
-        catering: cateringData.data.getAllCatering,
-        music: musicData.data.getAllMusic,
-        decoration: decorationData.data.getAllDecoration,
-        photography: photographyData.data.getAllPhotography,
+        catering: catering.map((s: any) => ({ ...s, category: "catering", id: s.id_catering })),
+        music: music.map((s: any) => ({ ...s, category: "music", id: s.id_music })),
+        decoration: decoration.map((s: any) => ({ ...s, category: "decoration", id: s.id_decoration })),
+        photography: photography.map((s: any) => ({ ...s, category: "photography", id: s.id_photography })),
       })
     } catch (error) {
       console.error("Error fetching services:", error)
     }
   }
 
-  const handleCreateService = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleCreateService = async () => {
     try {
-      let url = ""
-      let body = {}
       switch (newService.type) {
         case "catering":
-          url = "http://44.208.178.247:8071/cateringC/create"
-          body = { name: newService.name, price: Number.parseFloat(newService.price) }
+          await createCateringService({ name: newService.name, price: Number(newService.price) })
           break
         case "music":
-          url = "http://54.173.57.181:8061/musicC/create"
-          body = { name: newService.name, price: Number.parseFloat(newService.price) }
+          await createMusicService({ name: newService.name, price: Number(newService.price) })
           break
         case "decoration":
-          url = "http://44.212.202.69:8041/decorationC/create"
-          body = { name: newService.name, price: Number.parseFloat(newService.price) }
+          await createDecorationService({ name: newService.name, price: Number(newService.price) })
           break
         case "photography":
-          url = "http://3.229.141.153:8051/photographyC/create"
-          body = { name: newService.name, price: Number.parseFloat(newService.price) }
+          await createPhotographyService({ name: newService.name, price: Number(newService.price) })
           break
-        default:
-          throw new Error("Invalid service type")
       }
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to create service")
-      }
-
-      // Refresh the services list
       await fetchAllServices()
-
-      // Reset the form
       setNewService({ type: "", name: "", price: "" })
+      setIsDialogOpen(false)
+      toast({ title: "Éxito", description: "Servicio creado correctamente" })
     } catch (error) {
       console.error("Error creating service:", error)
     }
   }
 
-  const handleDeleteService = async (type: string, id: string) => {
+  const handleUpdateService = async () => {
+    if (!editingService) return
+
     try {
-      let url = ""
-      switch (type) {
+      switch (editingService.category) {
         case "catering":
-          url = `http://44.208.178.247:8074/cateringD/delete/${id}`
+          await updateCateringService(editingService.id, { name: editingService.name, price: editingService.price })
           break
         case "music":
-          url = `http://184.72.70.45:8064/musicD/delete/${id}`
+          await updateMusicService(editingService.id, { name: editingService.name, price: editingService.price })
           break
         case "decoration":
-          url = `http://44.212.202.69:8044/decorationD/delete/${id}`
+          await updateDecorationService(editingService.id, { name: editingService.name, price: editingService.price })
           break
         case "photography":
-          url = `http://3.229.141.153:8054/photographyD/delete/${id}`
+          await updatePhotographyService(editingService.id, { name: editingService.name, price: editingService.price })
           break
-        default:
-          throw new Error("Invalid service type")
       }
 
-      const response = await fetch(url, { method: "DELETE" })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete service")
-      }
-
-      // Refresh the services list
       await fetchAllServices()
+      setEditingService(null)
+      setIsEditDialogOpen(false)
+      toast({ title: "Éxito", description: "Servicio actualizado correctamente" })
+    } catch (error) {
+      console.error("Error updating service:", error)
+    }
+  }
+
+  const handleDeleteService = async (service: Service) => {
+    try {
+      switch (service.category) {
+        case "catering":
+          await deleteCateringService(service.id)
+          break
+        case "music":
+          await deleteMusicService(service.id)
+          break
+        case "decoration":
+          await deleteDecorationService(service.id)
+          break
+        case "photography":
+          await deletePhotographyService(service.id)
+          break
+      }
+
+      await fetchAllServices()
+      toast({ title: "Éxito", description: "Servicio eliminado correctamente" })
     } catch (error) {
       console.error("Error deleting service:", error)
     }
@@ -143,76 +149,121 @@ export default function ServiceManagement() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Service Management</h2>
+      <h2 className="text-2xl font-bold mb-4">Gestión de Servicios</h2>
 
-      <form onSubmit={handleCreateService} className="mb-8">
-        <h3 className="text-xl font-bold mb-2">Create New Service</h3>
-        <div className="flex space-x-4">
-          <select
-            value={newService.type}
-            onChange={(e) => setNewService({ ...newService, type: e.target.value })}
-            className="border p-2 rounded"
-            required
-          >
-            <option value="">Select Type</option>
-            <option value="catering">Catering</option>
-            <option value="music">Music</option>
-            <option value="decoration">Decoration</option>
-            <option value="photography">Photography</option>
-          </select>
-          <input
-            type="text"
-            value={newService.name}
-            onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-            placeholder="Service Name"
-            className="border p-2 rounded"
-            required
-          />
-          <input
-            type="number"
-            value={newService.price}
-            onChange={(e) => setNewService({ ...newService, price: e.target.value })}
-            placeholder="Price"
-            className="border p-2 rounded"
-            required
-          />
-          <button type="submit" className="bg-green-500 text-white p-2 rounded">
-            Create
-          </button>
-        </div>
-      </form>
+      {/* Crear servicio */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button className="mb-4">Crear Servicio</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Service</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
 
-      {Object.entries(services).map(([type, serviceList]) => (
-        <div key={type} className="mb-8">
-          <h3 className="text-xl font-bold mb-2 capitalize">{type}</h3>
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="text-left">Name</th>
-                <th className="text-left">Price</th>
-                <th className="text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+            {/* Selección de Categoría con colores diferenciados */}
+            <Select
+              value={newService.type}
+              onValueChange={(value) => setNewService({ ...newService, type: value })}
+            >
+              <SelectTrigger className="bg-gray-100 text-gray-700 border-2 border-gray-300 hover:border-blue-500 focus:border-blue-500 rounded-md p-2">
+                <SelectValue placeholder="Seleccionar Categoría" />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-gray-800 border border-gray-300 shadow-lg rounded-md">
+                <SelectItem value="catering" className="hover:bg-blue-100 hover:text-blue-700 font-semibold">
+                  🍽️ Catering
+                </SelectItem>
+                <SelectItem value="music" className="hover:bg-green-100 hover:text-green-700 font-semibold">
+                  🎵 Music
+                </SelectItem>
+                <SelectItem value="decoration" className="hover:bg-yellow-100 hover:text-yellow-700 font-semibold">
+                  🎨 Decoration
+                </SelectItem>
+                <SelectItem value="photography" className="hover:bg-purple-100 hover:text-purple-700 font-semibold">
+                  📷 Photography
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Campos de Nombre y Precio */}
+            <Input
+              placeholder="Nombre del servicio"
+              value={newService.name}
+              onChange={(e) => setNewService({ ...newService, name: e.target.value })}
+              className="border-2 border-gray-300 focus:border-blue-500 rounded-md p-2"
+            />
+            <Input
+              placeholder="Precio"
+              type="number"
+              value={newService.price}
+              onChange={(e) => setNewService({ ...newService, price: e.target.value })}
+              className="border-2 border-gray-300 focus:border-blue-500 rounded-md p-2"
+            />
+
+            {/* Botón de Crear */}
+            <Button
+              onClick={handleCreateService}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-md"
+            >
+              Create
+            </Button>
+
+          </div>
+        </DialogContent>
+      </Dialog>
+
+
+      {/* Editar servicio */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Actualizar Servicio</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Input
+              placeholder="Nombre"
+              value={editingService?.name || ""}
+              onChange={(e) => setEditingService({ ...editingService!, name: e.target.value })}
+            />
+            <Input
+              placeholder="Precio"
+              type="number"
+              value={editingService?.price || ""}
+              onChange={(e) => setEditingService({ ...editingService!, price: Number(e.target.value) })}
+            />
+            <Button onClick={handleUpdateService}>Update</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tabla de servicios */}
+      {Object.entries(services).map(([category, serviceList]) => (
+        <div key={category} className="mb-8">
+          <h3 className="text-xl font-bold mb-2 capitalize">{category}</h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {serviceList.map((service) => (
-                <tr key={service.id}>
-                  <td>{service.name}</td>
-                  <td>${service.price}</td>
-                  <td>
-                    <button
-                      onClick={() => handleDeleteService(type, service.id)}
-                      className="bg-red-500 text-white p-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                <TableRow key={service.id}>
+                  <TableCell>{service.name}</TableCell>
+                  <TableCell>${service.price}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" onClick={() => { setEditingService(service); setIsEditDialogOpen(true) }}>Update</Button>
+                    <Button variant="destructive" onClick={() => handleDeleteService(service)}>Delete</Button>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       ))}
     </div>
   )
 }
-
